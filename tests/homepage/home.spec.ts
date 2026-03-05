@@ -31,7 +31,6 @@ test("has card title and price", async ({ page }) => {
   await page.locator(".card").first().waitFor();
 
   const cardCount = await page.locator(".card-block").count();
-  console.log(cardCount);
   await expect(page.locator(".card-title")).toHaveCount(cardCount);
   await expect(page.locator(".card-block h5", { hasText: "$" })).toHaveCount(
     cardCount,
@@ -49,13 +48,11 @@ test("has working filters", async ({ page }) => {
 
   await page.locator(".card").first().waitFor();
   const totalCount = await page.locator(".card-block").count();
-  console.log(totalCount);
 
   await page.locator(".list-group-item", { hasText: "Phones" }).click();
   await expect(page.locator(".card")).not.toHaveCount(totalCount);
 
   const filterCount = await page.locator(".card-block").count();
-  console.log(filterCount);
 
   expect(filterCount).toBeLessThan(totalCount);
 });
@@ -70,7 +67,6 @@ test("product card leads to product page", async ({ page }) => {
 test("has working pagination", async ({ page }) => {
   await page.locator(".card").first().waitFor();
   const pageOneProduct = await page.locator(".card-title").last().innerText();
-  console.log(pageOneProduct);
 
   await page.locator(".page-item #next2", { hasText: "Next" }).click();
   await expect(page.locator(".card-title").last()).not.toHaveText(
