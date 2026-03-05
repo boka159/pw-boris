@@ -67,7 +67,7 @@ test("product card leads to product page", async ({ page }) => {
   await expect(page.locator(".name")).toHaveText(productTitle);
 });
 
-test.only("has working pagination", async ({ page }) => {
+test("has working pagination", async ({ page }) => {
   await page.locator(".card").first().waitFor();
   const pageOneProduct = await page.locator(".card-title").last().innerText();
   console.log(pageOneProduct);
