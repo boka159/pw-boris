@@ -18,3 +18,8 @@ export const CATEGORIES = {
   ],
   monitors: ["Apple monitor 24", "ASUS Full HD"],
 };
+
+export const CREDENTIALS = {
+  username: "boka159",
+  password: "Test1234$",
+};
