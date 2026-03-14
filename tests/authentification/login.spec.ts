@@ -16,7 +16,7 @@ test("Click on Log in opens login modal", async ({ page }) => {
 test("successful login shows welcome user and log out links", async ({
   page,
 }) => {
-  await login(page);
+  await login(page, CREDENTIALS.username, CREDENTIALS.password);
 
   await expect
     .soft(page.locator("#logout2", { hasText: "Log out" }))
@@ -86,7 +86,7 @@ test("click on Close closes the modal", async ({ page }) => {
 });
 
 test("click on Log out logs the user out", async ({ page }) => {
-  await login(page);
+  await login(page, CREDENTIALS.username, CREDENTIALS.password);
 
   await expect
     .soft(page.locator("#logout2", { hasText: "Log out" }))
