@@ -5,7 +5,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto("/prod.html?idp_=1");
 });
 
-test("product page has neccessary elements ", async ({ page }) => {
+test("product page has necessary elements ", async ({ page }) => {
   await expect(page.locator(".name")).toBeVisible();
   await expect(
     page.locator(".price-container", { hasText: "$" }),
