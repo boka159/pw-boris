@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { CREDENTIALS } from "../../testData";
-import { login } from "../../helpers";
+import { closeModalOnButton, closeModalOnX, login } from "../../helpers";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
@@ -62,11 +62,7 @@ test("existing username returns error", async ({ page }) => {
 
 test("click on X closes the modal", async ({ page }) => {
   await page.locator("#navbarExample a", { hasText: "Sign up" }).click();
-  await page
-    .locator("html")
-    .getByRole("dialog", { name: "Sign up" })
-    .getByLabel("Close")
-    .click();
+  await closeModalOnX(page, "Sign up");
 
   await expect(
     page.locator(".modal-header h5", { hasText: "Sign up" }),
@@ -75,7 +71,7 @@ test("click on X closes the modal", async ({ page }) => {
 
 test("click on Close closes the modal", async ({ page }) => {
   await page.locator("#navbarExample a", { hasText: "Sign up" }).click();
-  await page.locator("html").getByLabel("Sign up").getByText("Close").click();
+  await closeModalOnButton(page, "Sign up");
 
   await expect(
     page.locator(".modal-header h5", { hasText: "Sign up" }),

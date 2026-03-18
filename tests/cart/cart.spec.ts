@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { addToCart } from "../../helpers";
+import { addToCart, closeModalOnButton, closeModalOnX } from "../../helpers";
 
 test.describe("empty cart", () => {
   test.beforeEach(async ({ page }) => {
@@ -59,11 +59,7 @@ test.describe("empty cart", () => {
       .getByRole("button", { name: "Place Order" })
       .click();
 
-    await page
-      .locator("html")
-      .getByRole("dialog", { name: "Place order" })
-      .getByLabel("Close")
-      .click();
+    await closeModalOnX(page, "Place order");
 
     await expect(
       page.locator("html").getByRole("heading", { name: "Place order" }),
@@ -76,11 +72,7 @@ test.describe("empty cart", () => {
       .getByRole("button", { name: "Place Order" })
       .click();
 
-    await page
-      .locator("html")
-      .getByLabel("Place order")
-      .getByText("Close")
-      .click();
+    await closeModalOnButton(page, "Place order");
 
     await expect(
       page.locator("html").getByRole("heading", { name: "Place order" }),
