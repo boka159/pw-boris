@@ -1,5 +1,4 @@
 import { test, expect } from "@playwright/test";
-import { addToCart } from "../../helpers";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/prod.html?idp_=1");
@@ -25,5 +24,5 @@ test("successfully adds product to cart ", async ({ page }) => {
     await dialog.accept();
   });
 
-  await addToCart(page);
+  await page.locator("html").getByRole("link", { name: "Add to cart" }).click();
 });

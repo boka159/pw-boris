@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { CREDENTIALS } from "../../testData";
-import { closeModalOnButton, closeModalOnX, login } from "../../helpers";
+import { closeModalOnButton, closeModalOnX } from "../../helpers/closeModal";
+import { login } from "../../helpers/login";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/");

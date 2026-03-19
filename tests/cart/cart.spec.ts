@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { addToCart, closeModalOnButton, closeModalOnX } from "../../helpers";
+import { closeModalOnButton, closeModalOnX } from "../../helpers/closeModal";
 
 test.describe("empty cart", () => {
   test.beforeEach(async ({ page }) => {
@@ -82,7 +82,10 @@ test.describe("empty cart", () => {
 
 test.describe("cart has items", () => {
   test.beforeEach(async ({ page }) => {
-    await addToCart(page);
+    await page
+      .locator("html")
+      .getByRole("link", { name: "Add to cart" })
+      .click();
     await page.goto("/cart.html");
   });
 
