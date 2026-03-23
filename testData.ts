@@ -23,3 +23,12 @@ export const CREDENTIALS = {
   username: "boka159",
   password: "Test1234$",
 };
+
+export const BUYER = {
+  name: "Boris",
+  country: "Croatia",
+  city: "Osijek",
+  card: "TestCreditCard",
+  month: "March",
+  year: "2026",
+};

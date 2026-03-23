@@ -85,3 +85,24 @@ test("has working pagination", async ({ page }) => {
   await page.locator(".page-item #prev2", { hasText: "Previous" }).click();
   await expect(page.locator(".card-title")).toContainText([pageOneProduct]);
 });
+
+test("footer has necessary elements", async ({ page }) => {
+  await expect
+    .soft(page.locator(".caption h4", { hasText: "About Us" }))
+    .toBeVisible();
+  await expect
+    .soft(page.locator(".caption h4", { hasText: "Get in Touch" }))
+    .toBeVisible();
+  await expect
+    .soft(page.locator("html").getByText("Address: 2390 El Camino Real"))
+    .toBeVisible();
+  await expect
+    .soft(page.locator("html").getByText("Phone: +440 123456"))
+    .toBeVisible();
+  await expect
+    .soft(page.locator("html").getByText("Email: demo@blazemeter.com"))
+    .toBeVisible();
+  await expect(
+    page.locator("html").getByRole("heading", { name: "PRODUCT STORE" }),
+  ).toBeVisible();
+});
