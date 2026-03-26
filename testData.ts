@@ -32,3 +32,9 @@ export const BUYER = {
   month: "March",
   year: "2026",
 };
+
+export const CONTACT = {
+  email: "test+1@test.test",
+  name: "Boris",
+  message: "Test message one two three",
+};

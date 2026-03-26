@@ -95,10 +95,16 @@ test.describe("cart has items", () => {
     await page.goto("/prod.html?idp_=1");
     productTitle = await page.locator(".name").innerText();
 
+    const dialogPromise = page.waitForEvent("dialog");
+
     await page
       .locator("html")
       .getByRole("link", { name: "Add to cart" })
       .click();
+
+    const dialog = await dialogPromise;
+    await dialog.accept();
+
     await page.goto("/cart.html");
   });
 
@@ -130,7 +136,7 @@ test.describe("cart has items", () => {
     ).toBeVisible();
 
     const productPrice = await page
-      .locator("html")
+      .locator(".success", { hasText: productTitle })
       .getByRole("cell")
       .nth(2)
       .innerText();
@@ -166,8 +172,14 @@ test.describe("cart has items", () => {
       page.locator(".sweet-alert h2", {
         hasText: "Thank you for your purchase!",
       }),
-    ).toBeVisible;
+    ).toBeVisible();
+
     await page.locator("html").getByRole("button", { name: "OK" }).click();
+    await expect(
+      page.locator(".sweet-alert h2", {
+        hasText: "Thank you for your purchase!",
+      }),
+    ).not.toBeVisible();
   });
 
   test("mandatory empty fields return error", async ({ page }) => {

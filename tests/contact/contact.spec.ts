@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { closeModalOnButton, closeModalOnX } from "../../helpers/closeModal";
+import { CONTACT } from "../../testData";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
@@ -26,10 +27,10 @@ test("has necessary elements", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("sends message sucessfully", async ({ page }) => {
-  await page.locator("#recipient-email").fill("test+1@test.test");
-  await page.locator("#recipient-name").fill("Boris");
-  await page.locator("#message-text").fill("Test message one two three");
+test("sends message successfully", async ({ page }) => {
+  await page.locator("#recipient-email").fill(CONTACT.email);
+  await page.locator("#recipient-name").fill(CONTACT.name);
+  await page.locator("#message-text").fill(CONTACT.message);
 
   page.on("dialog", async (dialog) => {
     expect(dialog.message()).toBe("Thanks for the message!!");
@@ -40,13 +41,17 @@ test("sends message sucessfully", async ({ page }) => {
     .locator("html")
     .getByRole("button", { name: "Send message" })
     .click();
+
+  await expect(
+    page.locator("html").getByRole("heading", { name: "New message" }),
+  ).not.toBeVisible();
 });
 
 test("click on X closes the modal", async ({ page }) => {
   await closeModalOnX(page, "New message");
 
   await expect(
-    page.locator(".modal-header h5", { hasText: "New message" }),
+    page.locator("html").getByRole("heading", { name: "New message" }),
   ).not.toBeVisible();
 });
 
@@ -54,6 +59,6 @@ test("click on Close closes the modal", async ({ page }) => {
   await closeModalOnButton(page, "New message");
 
   await expect(
-    page.locator(".modal-header h5", { hasText: "New message" }),
+    page.locator("html").getByRole("heading", { name: "New message" }),
   ).not.toBeVisible();
 });
