@@ -152,9 +152,9 @@ test.describe("cart has items", () => {
       .getByRole("button", { name: "Place Order" })
       .click();
 
-    await expect
-      .soft(page.locator("html").getByRole("heading", { name: "Place order" }))
-      .toBeVisible();
+    await expect(
+      page.locator("html").getByRole("heading", { name: "Place order" }),
+    ).toBeVisible();
 
     await page.locator("#name").fill(BUYER.name);
     await page.locator("#country").fill(BUYER.country);
