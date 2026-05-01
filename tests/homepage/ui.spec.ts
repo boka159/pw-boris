@@ -37,3 +37,55 @@ test("categories filter has linear gradient", async ({ page }) => {
     "linear-gradient(135deg, rgb(76, 0, 255), rgb(0, 207, 255))",
   );
 });
+
+test("navbar links have hover effect", async ({ page }) => {
+  await expect(page.locator("#navbarExample")).toBeVisible();
+
+  const navbarLinks = await page
+    .locator("#navbarExample a")
+    .filter({ visible: true })
+    .all();
+
+  for (const a of navbarLinks) {
+    await a.hover();
+
+    await expect.soft(a).toHaveCSS("color", "rgb(0, 170, 255)");
+    await expect(a).toHaveCSS(
+      "text-shadow",
+      "rgba(0, 170, 255, 0.5) 0px 0px 8px",
+    );
+  }
+});
+
+test("product title has hover effect", async ({ page }) => {
+  await expect(page.locator(".card").first()).toBeVisible();
+
+  const productTitles = await page
+    .locator(".card a")
+    .filter({ visible: true })
+    .all();
+
+  for (const a of productTitles) {
+    await a.hover();
+
+    await expect.soft(a).toHaveCSS("text-decoration-color", "rgb(1, 76, 140)");
+    await expect.soft(a).toHaveCSS("text-decoration-style", "solid");
+    await expect.soft(a).toHaveCSS("text-decoration-thickness", "auto");
+    await expect(a).toHaveCSS("text-decoration-line", "underline");
+    await expect(a).toHaveCSS("color", "rgb(1, 76, 140)");
+  }
+});
+
+test("navbar has linear gradient background", async ({ page }) => {
+  await expect(page.locator(".navbar")).toHaveCSS(
+    "background-image",
+    "linear-gradient(135deg, rgb(76, 0, 255), rgb(0, 207, 255))",
+  );
+});
+
+test("footer has linear gradient background", async ({ page }) => {
+  await expect(page.locator("#footc")).toHaveCSS(
+    "background-image",
+    "linear-gradient(135deg, rgb(76, 0, 255), rgb(0, 207, 255))",
+  );
+});
