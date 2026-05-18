@@ -1,13 +1,21 @@
 import { test, expect } from "@playwright/test";
 import { closeModalOnButton, closeModalOnX } from "../../helpers/closeModal";
-import { login } from "../../helpers/login";
+import { LoginModal } from "../../pages/loginModal.page";
+import { NavBar } from "../../pages/navbar.page";
 import { CREDENTIALS, BUYER } from "../../testData";
 import { expectDialog } from "../../helpers/dialog";
 
 test.describe("empty cart", () => {
+  let navbar: NavBar;
+  let loginModal: LoginModal;
+
   test.beforeEach(async ({ page }) => {
+    navbar = new NavBar(page);
+    loginModal = new LoginModal(page);
+
     await page.goto("/");
-    await login(page, CREDENTIALS.username, CREDENTIALS.password);
+    await navbar.loginButton.click();
+    await loginModal.login(CREDENTIALS.username, CREDENTIALS.password);
 
     await page.goto("/cart.html");
   });
@@ -87,11 +95,17 @@ test.describe("empty cart", () => {
 });
 
 test.describe("cart has items", () => {
+  let navbar: NavBar;
+  let loginModal: LoginModal;
   let productTitle: string;
 
   test.beforeEach(async ({ page }) => {
+    navbar = new NavBar(page);
+    loginModal = new LoginModal(page);
+
     await page.goto("/");
-    await login(page, CREDENTIALS.username, CREDENTIALS.password);
+    await navbar.loginButton.click();
+    await loginModal.login(CREDENTIALS.username, CREDENTIALS.password);
 
     await page.goto("/prod.html?idp_=1");
     productTitle = await page.locator(".name").innerText();
