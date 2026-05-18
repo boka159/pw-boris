@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 import { closeModalOnButton, closeModalOnX } from "../../helpers/closeModal";
 import { login } from "../../helpers/login";
 import { CREDENTIALS, BUYER } from "../../testData";
+import { expectDialog } from "../../helpers/dialog";
 
 test.describe("empty cart", () => {
   test.beforeEach(async ({ page }) => {
@@ -192,10 +193,7 @@ test.describe("cart has items", () => {
       .soft(page.locator("html").getByRole("heading", { name: "Place order" }))
       .toBeVisible();
 
-    page.on("dialog", async (dialog) => {
-      expect(dialog.message()).toBe("Please fill out Name and Creditcard.");
-      await dialog.accept();
-    });
+    expectDialog(page, "Please fill out Name and Creditcard.");
 
     await page
       .locator("html")

@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 import { CREDENTIALS } from "../../testData";
 import { closeModalOnButton, closeModalOnX } from "../../helpers/closeModal";
 import { login } from "../../helpers/login";
+import { expectDialog } from "../../helpers/dialog";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
@@ -21,10 +22,7 @@ test("successful sign up", async ({ page }) => {
   await page.locator("#sign-username").fill(username);
   await page.locator("#sign-password").fill(CREDENTIALS.password);
 
-  page.on("dialog", async (dialog) => {
-    expect(dialog.message()).toBe("Sign up successful.");
-    await dialog.accept();
-  });
+  expectDialog(page, "Sign up successful.");
 
   await page.locator("html").getByRole("button", { name: "Sign up" }).click();
 
@@ -40,10 +38,7 @@ test("successful sign up", async ({ page }) => {
 test("empty credential field returns error", async ({ page }) => {
   await page.locator("#navbarExample a", { hasText: "Sign up" }).click();
 
-  page.on("dialog", async (dialog) => {
-    expect(dialog.message()).toBe("Please fill out Username and Password.");
-    await dialog.accept();
-  });
+  expectDialog(page, "Please fill out Username and Password.");
 
   await page.locator("html").getByRole("button", { name: "Sign up" }).click();
 });
@@ -53,10 +48,7 @@ test("existing username returns error", async ({ page }) => {
   await page.locator("#sign-username").fill(CREDENTIALS.username);
   await page.locator("#sign-password").fill(CREDENTIALS.password);
 
-  page.on("dialog", async (dialog) => {
-    expect(dialog.message()).toBe("This user already exist.");
-    await dialog.accept();
-  });
+  expectDialog(page, "This user already exist.");
 
   await page.locator("html").getByRole("button", { name: "Sign up" }).click();
 });

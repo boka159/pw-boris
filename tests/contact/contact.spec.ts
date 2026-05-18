@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { closeModalOnButton, closeModalOnX } from "../../helpers/closeModal";
 import { CONTACT } from "../../testData";
+import { expectDialog } from "../../helpers/dialog";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
@@ -32,10 +33,7 @@ test("sends message successfully", async ({ page }) => {
   await page.locator("#recipient-name").fill(CONTACT.name);
   await page.locator("#message-text").fill(CONTACT.message);
 
-  page.on("dialog", async (dialog) => {
-    expect(dialog.message()).toBe("Thanks for the message!!");
-    await dialog.accept();
-  });
+  expectDialog(page, "Thanks for the message!!");
 
   await page
     .locator("html")

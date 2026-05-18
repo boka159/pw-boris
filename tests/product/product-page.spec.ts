@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { expectDialog } from "../../helpers/dialog";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/prod.html?idp_=1");
@@ -19,10 +20,7 @@ test("product page has necessary elements ", async ({ page }) => {
 });
 
 test("successfully adds product to cart ", async ({ page }) => {
-  page.on("dialog", async (dialog) => {
-    expect(dialog.message()).toBe("Product added");
-    await dialog.accept();
-  });
+  expectDialog(page, "Product added");
 
   await page.locator("html").getByRole("link", { name: "Add to cart" }).click();
 });

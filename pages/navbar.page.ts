@@ -25,22 +25,5 @@ export class NavBar {
     });
   }
 
-  async clickOnLogin() {
-    await this.loginButton.click();
-  }
-  async clickOnSignUp() {
-    await this.signUpButton.click();
-  }
-  async clickOnLogout() {
-    await this.logoutButton.click();
-  }
-  async clickOnContact() {
-    await this.contactButton.click();
-  }
-  async clickOnAboutUs() {
-    await this.aboutUsButton.click();
-  }
-  async clickOnCart() {
-    await this.cartButton.click();
-  }
+
 }
