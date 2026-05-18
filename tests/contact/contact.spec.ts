@@ -2,61 +2,67 @@ import { test, expect } from "@playwright/test";
 import { closeModalOnButton, closeModalOnX } from "../../helpers/closeModal";
 import { CONTACT } from "../../testData";
 import { expectDialog } from "../../helpers/dialog";
+import { NavBar } from "../../pages/navbar.page";
 
-test.beforeEach(async ({ page }) => {
-  await page.goto("/");
-  await page.locator("#navbarExample a", { hasText: "Contact" }).click();
-});
+test.describe("NavBar", () => {
+  let navbar: NavBar;
 
-test("has necessary elements", async ({ page }) => {
-  await expect(
-    page.locator("html").getByRole("heading", { name: "New message" }),
-  ).toBeVisible();
+  test.beforeEach(async ({ page }) => {
+    navbar = new NavBar(page);
+    await page.goto("/");
+    await navbar.contactButton.click();
+  });
 
-  await expect(page.locator(".form-control-label")).toContainText([
-    "Contact Email:",
-    "Contact Name:",
-    "Message:",
-  ]);
+  test("has necessary elements", async ({ page }) => {
+    await expect(
+      page.locator("html").getByRole("heading", { name: "New message" }),
+    ).toBeVisible();
 
-  await expect(
-    page.locator("#recipient-email, #recipient-name, #message-text"),
-  ).toHaveCount(3);
+    await expect(page.locator(".form-control-label")).toContainText([
+      "Contact Email:",
+      "Contact Name:",
+      "Message:",
+    ]);
 
-  await expect(
-    page.locator("html").getByRole("button", { name: "Send message" }),
-  ).toBeVisible();
-});
+    await expect(
+      page.locator("#recipient-email, #recipient-name, #message-text"),
+    ).toHaveCount(3);
 
-test("sends message successfully", async ({ page }) => {
-  await page.locator("#recipient-email").fill(CONTACT.email);
-  await page.locator("#recipient-name").fill(CONTACT.name);
-  await page.locator("#message-text").fill(CONTACT.message);
+    await expect(
+      page.locator("html").getByRole("button", { name: "Send message" }),
+    ).toBeVisible();
+  });
 
-  expectDialog(page, "Thanks for the message!!");
+  test("sends message successfully", async ({ page }) => {
+    await page.locator("#recipient-email").fill(CONTACT.email);
+    await page.locator("#recipient-name").fill(CONTACT.name);
+    await page.locator("#message-text").fill(CONTACT.message);
 
-  await page
-    .locator("html")
-    .getByRole("button", { name: "Send message" })
-    .click();
+    expectDialog(page, "Thanks for the message!!");
 
-  await expect(
-    page.locator("html").getByRole("heading", { name: "New message" }),
-  ).not.toBeVisible();
-});
+    await page
+      .locator("html")
+      .getByRole("button", { name: "Send message" })
+      .click();
 
-test("click on X closes the modal", async ({ page }) => {
-  await closeModalOnX(page, "New message");
+    await expect(
+      page.locator("html").getByRole("heading", { name: "New message" }),
+    ).not.toBeVisible();
+  });
 
-  await expect(
-    page.locator("html").getByRole("heading", { name: "New message" }),
-  ).not.toBeVisible();
-});
+  test("click on X closes the modal", async ({ page }) => {
+    await closeModalOnX(page, "New message");
 
-test("click on Close closes the modal", async ({ page }) => {
-  await closeModalOnButton(page, "New message");
+    await expect(
+      page.locator("html").getByRole("heading", { name: "New message" }),
+    ).not.toBeVisible();
+  });
 
-  await expect(
-    page.locator("html").getByRole("heading", { name: "New message" }),
-  ).not.toBeVisible();
+  test("click on Close closes the modal", async ({ page }) => {
+    await closeModalOnButton(page, "New message");
+
+    await expect(
+      page.locator("html").getByRole("heading", { name: "New message" }),
+    ).not.toBeVisible();
+  });
 });
