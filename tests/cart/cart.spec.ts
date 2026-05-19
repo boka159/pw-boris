@@ -4,6 +4,7 @@ import { LoginModal } from "../../pages/loginModal.page";
 import { NavBar } from "../../pages/navbar.page";
 import { CREDENTIALS, BUYER } from "../../testData";
 import { expectDialog } from "../../helpers/dialog";
+import { ProductPage } from "../../pages/productPage.page";
 
 test.describe("empty cart", () => {
   let navbar: NavBar;
@@ -97,25 +98,25 @@ test.describe("empty cart", () => {
 test.describe("cart has items", () => {
   let navbar: NavBar;
   let loginModal: LoginModal;
+  let product: ProductPage;
+
   let productTitle: string;
 
   test.beforeEach(async ({ page }) => {
     navbar = new NavBar(page);
     loginModal = new LoginModal(page);
+    product = new ProductPage(page);
 
     await page.goto("/");
     await navbar.loginButton.click();
     await loginModal.login(CREDENTIALS.username, CREDENTIALS.password);
 
     await page.goto("/prod.html?idp_=1");
-    productTitle = await page.locator(".name").innerText();
+    productTitle = await product.name.innerText();
 
     const dialogPromise = page.waitForEvent("dialog");
 
-    await page
-      .locator("html")
-      .getByRole("link", { name: "Add to cart" })
-      .click();
+    await product.addToCartButton.click();
 
     const dialog = await dialogPromise;
     await dialog.accept();

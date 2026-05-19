@@ -1,108 +1,113 @@
 import { test, expect } from "@playwright/test";
 import { CATEGORIES } from "../../testData";
+import { HomePage } from "../../pages/homepage.page";
 
-test.beforeEach(async ({ page }) => {
-  await page.goto("/");
-});
+test.describe("HomePage", async () => {
+  let homepage: HomePage;
 
-test("has title", async ({ page }) => {
-  await expect(page).toHaveTitle(/STORE/);
-});
+  test.beforeEach(async ({ page }) => {
+    homepage = new HomePage(page);
 
-test("has nav logo and links", async ({ page }) => {
-  await expect.soft(page.locator(".navbar-brand")).toHaveText("PRODUCT STORE");
-  await expect(page.locator("#navbarExample a")).toContainText([
-    "Home",
-    "Contact",
-    "About us",
-    "Cart",
-    "Log in",
-    "Sign up",
-  ]);
-});
+    await page.goto("/");
+  });
 
-test("has products", async ({ page }) => {
-  await expect.soft(page.locator(".card").first()).toBeVisible();
-  const count = await page.locator(".card").count();
+  test("has title", async ({ page }) => {
+    await expect(page).toHaveTitle(/STORE/);
+  });
 
-  await expect(count).toEqual(9);
-});
+  test("has nav logo and links", async ({ page }) => {
+    await expect.soft(homepage.logo).toHaveText("PRODUCT STORE");
+    await expect(page.locator("#navbarExample a")).toContainText([
+      "Home",
+      "Contact",
+      "About us",
+      "Cart",
+      "Log in",
+      "Sign up",
+    ]);
+  });
 
-test("has card title and price", async ({ page }) => {
-  await expect.soft(page.locator(".card").first()).toBeVisible();
+  test("has products", async ({ page }) => {
+    await expect.soft(homepage.cards.first()).toBeVisible();
+    const count = await homepage.cards.count();
 
-  const cardCount = await page.locator(".card-block").count();
-  await expect.soft(page.locator(".card-title")).toHaveCount(cardCount);
-  await expect
-    .soft(page.locator(".card-block h5", { hasText: "$" }))
-    .toHaveCount(cardCount);
-  await expect(page.locator(".card-text")).toHaveCount(cardCount);
-});
+    await expect(count).toEqual(9);
+  });
 
-test("phones filter shows only phones", async ({ page }) => {
-  await page.locator(".list-group-item", { hasText: "Phones" }).click();
-  await expect(page.locator(".card")).toContainText(CATEGORIES.phones);
-  await expect(page.locator(".card")).not.toContainText([
-    ...CATEGORIES.monitors,
-    ...CATEGORIES.laptops,
-  ]);
-});
+  test("has card title and price", async ({ page }) => {
+    await expect.soft(homepage.cards.first()).toBeVisible();
 
-test("laptops filter shows only laptops", async ({ page }) => {
-  await page.locator(".list-group-item", { hasText: "Laptops" }).click();
-  await expect(page.locator(".card")).toContainText(CATEGORIES.laptops);
-  await expect(page.locator(".card")).not.toContainText([
-    ...CATEGORIES.monitors,
-    ...CATEGORIES.phones,
-  ]);
-});
+    const cardCount = await page.locator(".card-block").count();
+    await expect.soft(homepage.cardTitles).toHaveCount(cardCount);
+    await expect
+      .soft(page.locator(".card-block h5", { hasText: "$" }))
+      .toHaveCount(cardCount);
+    await expect(page.locator(".card-text")).toHaveCount(cardCount);
+  });
 
-test("monitors filter shows only monitors", async ({ page }) => {
-  await page.locator(".list-group-item", { hasText: "Monitors" }).click();
-  await expect(page.locator(".card")).toContainText(CATEGORIES.monitors);
-  await expect(page.locator(".card")).not.toContainText([
-    ...CATEGORIES.phones,
-    ...CATEGORIES.laptops,
-  ]);
-});
+  test("phones filter shows only phones", async ({ page }) => {
+    await homepage.phonesFilter.click();
+    await expect(homepage.cards).toContainText(CATEGORIES.phones);
+    await expect(homepage.cards).not.toContainText([
+      ...CATEGORIES.monitors,
+      ...CATEGORIES.laptops,
+    ]);
+  });
 
-test("product card leads to product page", async ({ page }) => {
-  const productTitle = await page.locator(".card-title").first().innerText();
-  await page.locator(".card-img-top").first().click();
+  test("laptops filter shows only laptops", async ({ page }) => {
+    await homepage.laptopsFilter.click();
+    await expect(homepage.cards).toContainText(CATEGORIES.laptops);
+    await expect(homepage.cards).not.toContainText([
+      ...CATEGORIES.monitors,
+      ...CATEGORIES.phones,
+    ]);
+  });
 
-  await expect(page.locator(".name")).toHaveText(productTitle);
-});
+  test("monitors filter shows only monitors", async ({ page }) => {
+    await homepage.monitorsFilter.click();
+    await expect(homepage.cards).toContainText(CATEGORIES.monitors);
+    await expect(homepage.cards).not.toContainText([
+      ...CATEGORIES.phones,
+      ...CATEGORIES.laptops,
+    ]);
+  });
 
-test("has working pagination", async ({ page }) => {
-  await expect.soft(page.locator(".card").first()).toBeVisible();
-  const pageOneProduct = await page.locator(".card-title").last().innerText();
+  test("product card leads to product page", async ({ page }) => {
+    const productTitle = await homepage.cardTitles.first().innerText();
+    await page.locator(".card-img-top").first().click();
 
-  await page.locator(".page-item #next2", { hasText: "Next" }).click();
-  await expect(page.locator(".card-title").last()).not.toHaveText(
-    pageOneProduct,
-  );
+    await expect(page.locator(".name")).toHaveText(productTitle);
+  });
 
-  await page.locator(".page-item #prev2", { hasText: "Previous" }).click();
-  await expect(page.locator(".card-title")).toContainText([pageOneProduct]);
-});
+  test("has working pagination", async ({ page }) => {
+    await expect.soft(homepage.cards.first()).toBeVisible();
+    const pageOneProduct = await homepage.cardTitles.last().innerText();
 
-test("footer has necessary elements", async ({ page }) => {
-  await expect
-    .soft(page.locator(".caption h4", { hasText: "About Us" }))
-    .toBeVisible();
-  await expect
-    .soft(page.locator(".caption h4", { hasText: "Get in Touch" }))
-    .toBeVisible();
-  await expect
-    .soft(page.locator("html").getByText("Address: 2390 El Camino Real"))
-    .toBeVisible();
-  await expect
-    .soft(page.locator("html").getByText("Phone: +440 123456"))
-    .toBeVisible();
-  await expect
-    .soft(page.locator("html").getByText("Email: demo@blazemeter.com"))
-    .toBeVisible();
-  await expect(
-    page.locator("html").getByRole("heading", { name: "PRODUCT STORE" }),
-  ).toBeVisible();
+    await homepage.nextButton.click();
+    await expect(homepage.cardTitles.last()).not.toHaveText(pageOneProduct);
+
+    await homepage.prevButton.click();
+    await expect(homepage.cardTitles).toContainText([pageOneProduct]);
+  });
+
+  test("footer has necessary elements", async ({ page }) => {
+    await expect
+      .soft(page.locator(".caption h4", { hasText: "About Us" }))
+      .toBeVisible();
+    await expect
+      .soft(page.locator(".caption h4", { hasText: "Get in Touch" }))
+      .toBeVisible();
+    await expect
+      .soft(page.locator("html").getByText("Address: 2390 El Camino Real"))
+      .toBeVisible();
+    await expect
+      .soft(page.locator("html").getByText("Phone: +440 123456"))
+      .toBeVisible();
+    await expect
+      .soft(page.locator("html").getByText("Email: demo@blazemeter.com"))
+      .toBeVisible();
+    await expect(
+      page.locator("html").getByRole("heading", { name: "PRODUCT STORE" }),
+    ).toBeVisible();
+  });
 });
