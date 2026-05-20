@@ -5,14 +5,20 @@ import { NavBar } from "../../pages/navbar.page";
 import { CREDENTIALS, BUYER } from "../../testData";
 import { expectDialog } from "../../helpers/dialog";
 import { ProductPage } from "../../pages/productPage.page";
+import { PlaceOrderModal } from "../../pages/placeOrderModal.page";
+import { CartPage } from "../../pages/cartPage.page";
 
 test.describe("empty cart", () => {
   let navbar: NavBar;
   let loginModal: LoginModal;
+  let placeOrderModal: PlaceOrderModal;
+  let cartPage: CartPage;
 
   test.beforeEach(async ({ page }) => {
     navbar = new NavBar(page);
     loginModal = new LoginModal(page);
+    placeOrderModal = new PlaceOrderModal(page);
+    cartPage = new CartPage(page);
 
     await page.goto("/");
     await navbar.loginButton.click();
@@ -25,25 +31,16 @@ test.describe("empty cart", () => {
     await expect
       .soft(page.locator("html").getByRole("navigation"))
       .toBeVisible();
-    await expect
-      .soft(page.locator("h2", { hasText: "Products" }))
-      .toBeVisible();
-    await expect.soft(page.locator(".table-responsive")).toBeVisible();
-    await expect.soft(page.locator("h2", { hasText: "Total" })).toBeVisible();
-    await expect(
-      page.locator("html").getByRole("button", { name: "Place Order" }),
-    ).toBeVisible();
+    await expect.soft(cartPage.productsHeading).toBeVisible();
+    await expect.soft(cartPage.table).toBeVisible();
+    await expect.soft(cartPage.totalHeading).toBeVisible();
+    await expect(cartPage.placeOrderButton).toBeVisible();
   });
 
   test("Place order opens modal with necessary elements", async ({ page }) => {
-    await page
-      .locator("html")
-      .getByRole("button", { name: "Place Order" })
-      .click();
+    await cartPage.placeOrderButton.click();
 
-    await expect
-      .soft(page.locator("html").getByRole("heading", { name: "Place order" }))
-      .toBeVisible();
+    await expect.soft(placeOrderModal.heading).toBeVisible();
 
     await expect
       .soft(
@@ -69,29 +66,19 @@ test.describe("empty cart", () => {
   });
 
   test("click on X closes modal", async ({ page }) => {
-    await page
-      .locator("html")
-      .getByRole("button", { name: "Place Order" })
-      .click();
+    await cartPage.placeOrderButton.click();
 
     await closeModalOnX(page, "Place order");
 
-    await expect(
-      page.locator("html").getByRole("heading", { name: "Place order" }),
-    ).not.toBeVisible();
+    await expect(placeOrderModal.heading).not.toBeVisible();
   });
 
   test("click on Close closes modal", async ({ page }) => {
-    await page
-      .locator("html")
-      .getByRole("button", { name: "Place Order" })
-      .click();
+    await cartPage.placeOrderButton.click();
 
     await closeModalOnButton(page, "Place order");
 
-    await expect(
-      page.locator("html").getByRole("heading", { name: "Place order" }),
-    ).not.toBeVisible();
+    await expect(placeOrderModal.heading).not.toBeVisible();
   });
 });
 
@@ -99,6 +86,8 @@ test.describe("cart has items", () => {
   let navbar: NavBar;
   let loginModal: LoginModal;
   let product: ProductPage;
+  let placeOrderModal: PlaceOrderModal;
+  let cartPage: CartPage;
 
   let productTitle: string;
 
@@ -106,6 +95,8 @@ test.describe("cart has items", () => {
     navbar = new NavBar(page);
     loginModal = new LoginModal(page);
     product = new ProductPage(page);
+    placeOrderModal = new PlaceOrderModal(page);
+    cartPage = new CartPage(page);
 
     await page.goto("/");
     await navbar.loginButton.click();
@@ -135,11 +126,7 @@ test.describe("cart has items", () => {
       page.locator("html").getByRole("cell", { name: productTitle }).first(),
     ).toBeVisible();
 
-    await page
-      .locator("html")
-      .getByRole("link", { name: "Delete" })
-      .first()
-      .click();
+    await cartPage.deleteButton.first().click();
 
     await expect(
       page.locator("html").getByRole("cell", { name: productTitle }).first(),
@@ -163,56 +150,31 @@ test.describe("cart has items", () => {
   });
 
   test("places order successfully", async ({ page }) => {
-    await page
-      .locator("html")
-      .getByRole("button", { name: "Place Order" })
-      .click();
+    await cartPage.placeOrderButton.click();
 
-    await expect(
-      page.locator("html").getByRole("heading", { name: "Place order" }),
-    ).toBeVisible();
+    await expect(placeOrderModal.heading).toBeVisible();
 
-    await page.locator("#name").fill(BUYER.name);
-    await page.locator("#country").fill(BUYER.country);
-    await page.locator("#city").fill(BUYER.city);
-    await page.locator("#card").fill(BUYER.card);
-    await page.locator("#month").fill(BUYER.month);
-    await page.locator("#year").fill(BUYER.year);
+    await placeOrderModal.fillOrder(
+      BUYER.name,
+      BUYER.country,
+      BUYER.city,
+      BUYER.card,
+      BUYER.month,
+      BUYER.year,
+    );
 
-    await page
-      .locator("html")
-      .getByRole("button", { name: "Purchase" })
-      .click();
-
-    await expect(
-      page.locator(".sweet-alert h2", {
-        hasText: "Thank you for your purchase!",
-      }),
-    ).toBeVisible();
-
-    await page.locator("html").getByRole("button", { name: "OK" }).click();
-    await expect(
-      page.locator(".sweet-alert h2", {
-        hasText: "Thank you for your purchase!",
-      }),
-    ).not.toBeVisible();
+    await expect(placeOrderModal.successMessage).toBeVisible();
+    await placeOrderModal.okButton.click();
+    await expect(placeOrderModal.successMessage).not.toBeVisible();
   });
 
   test("mandatory empty fields return error", async ({ page }) => {
-    await page
-      .locator("html")
-      .getByRole("button", { name: "Place Order" })
-      .click();
+    await cartPage.placeOrderButton.click();
 
-    await expect
-      .soft(page.locator("html").getByRole("heading", { name: "Place order" }))
-      .toBeVisible();
+    await expect.soft(placeOrderModal.heading).toBeVisible();
 
     expectDialog(page, "Please fill out Name and Creditcard.");
 
-    await page
-      .locator("html")
-      .getByRole("button", { name: "Purchase" })
-      .click();
+    await placeOrderModal.purchaseButton.click();
   });
 });
