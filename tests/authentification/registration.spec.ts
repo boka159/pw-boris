@@ -1,31 +1,28 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../../fixtures";
 import { CREDENTIALS } from "../../testData";
 import { closeModalOnButton, closeModalOnX } from "../../helpers/closeModal";
-import { LoginModal } from "../../pages/loginModal.page";
 import { expectDialog } from "../../helpers/dialog";
-import { NavBar } from "../../pages/navbar.page";
-import { SignUpModal } from "../../pages/signUpModal.page";
 
-test.describe("NavBar", () => {
-  let navbar: NavBar;
-  let loginModal: LoginModal;
-  let signUpModal: SignUpModal;
-
+test.describe("Registration", () => {
   test.beforeEach(async ({ page }) => {
-    navbar = new NavBar(page);
-    loginModal = new LoginModal(page);
-    signUpModal = new SignUpModal(page);
-
     await page.goto("/");
   });
 
-  test("click on Sign up opens sign up modal", async ({ page }) => {
+  test("click on Sign up opens sign up modal", async ({
+    navbar,
+    signUpModal,
+  }) => {
     await navbar.signUpButton.click();
 
     await expect(signUpModal.heading).toBeVisible();
   });
 
-  test("successful sign up", async ({ page }) => {
+  test("successful sign up", async ({
+    page,
+    navbar,
+    loginModal,
+    signUpModal,
+  }) => {
     const username = "user_" + Date.now();
 
     await navbar.signUpButton.click();
@@ -45,19 +42,27 @@ test.describe("NavBar", () => {
     ).toBeVisible();
   });
 
-  test("empty credential field returns error", async ({ page }) => {
+  test("empty credential field returns error", async ({
+    page,
+    navbar,
+    signUpModal,
+  }) => {
     await navbar.signUpButton.click();
     expectDialog(page, "Please fill out Username and Password.");
     await signUpModal.signUpButton.click();
   });
 
-  test("existing username returns error", async ({ page }) => {
+  test("existing username returns error", async ({
+    page,
+    navbar,
+    signUpModal,
+  }) => {
     await navbar.signUpButton.click();
     expectDialog(page, "This user already exist.");
     await signUpModal.signUp(CREDENTIALS.username, CREDENTIALS.password);
   });
 
-  test("click on X closes the modal", async ({ page }) => {
+  test("click on X closes the modal", async ({ page, navbar }) => {
     await navbar.signUpButton.click();
     await closeModalOnX(page, "Sign up");
 
@@ -66,7 +71,7 @@ test.describe("NavBar", () => {
     ).not.toBeVisible();
   });
 
-  test("click on Close closes the modal", async ({ page }) => {
+  test("click on Close closes the modal", async ({ page, navbar }) => {
     await navbar.signUpButton.click();
     await closeModalOnButton(page, "Sign up");
 

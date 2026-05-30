@@ -1,11 +1,7 @@
-import { test, expect } from "@playwright/test";
-import { NavBar } from "../../pages/navbar.page";
+import { test, expect } from "../../fixtures";
 
-test.describe("NavBar", () => {
-  let navbar: NavBar;
-
-  test.beforeEach(async ({ page }) => {
-    navbar = new NavBar(page);
+test.describe("About modal", () => {
+  test.beforeEach(async ({ page, navbar }) => {
     await page.goto("/");
     await navbar.aboutUsButton.click();
   });
@@ -38,7 +34,10 @@ test.describe("NavBar", () => {
     await expect(
       page.locator("html").getByRole("heading", { name: "About us" }),
     ).toBeVisible();
-    await page.locator("#videoModal").getByText("Close").click();
+    await page
+      .locator("#videoModal")
+      .getByText("Close", { exact: true })
+      .click();
 
     await expect(
       page

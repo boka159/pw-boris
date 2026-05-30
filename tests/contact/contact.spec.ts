@@ -1,23 +1,15 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../../fixtures";
 import { closeModalOnButton, closeModalOnX } from "../../helpers/closeModal";
 import { CONTACT } from "../../testData";
 import { expectDialog } from "../../helpers/dialog";
-import { NavBar } from "../../pages/navbar.page";
-import { ContactModal } from "../../pages/contactModal.page";
 
-test.describe("NavBar", () => {
-  let navbar: NavBar;
-  let contactModal: ContactModal;
-
-  test.beforeEach(async ({ page }) => {
-    navbar = new NavBar(page);
-    contactModal = new ContactModal(page);
-
+test.describe("Contact modal", () => {
+  test.beforeEach(async ({ page, navbar }) => {
     await page.goto("/");
     await navbar.contactButton.click();
   });
 
-  test("has necessary elements", async ({ page }) => {
+  test("has necessary elements", async ({ page, contactModal }) => {
     await expect(contactModal.heading).toBeVisible();
 
     await expect(page.locator(".form-control-label")).toContainText([
@@ -31,7 +23,7 @@ test.describe("NavBar", () => {
     await expect(contactModal.messageInput).toBeVisible();
   });
 
-  test("sends message successfully", async ({ page }) => {
+  test("sends message successfully", async ({ page, contactModal }) => {
     expectDialog(page, "Thanks for the message!!");
     await contactModal.sendMessage(
       CONTACT.email,
@@ -42,13 +34,13 @@ test.describe("NavBar", () => {
     await expect(contactModal.heading).not.toBeVisible();
   });
 
-  test("click on X closes the modal", async ({ page }) => {
+  test("click on X closes the modal", async ({ page, contactModal }) => {
     await closeModalOnX(page, "New message");
 
     await expect(contactModal.heading).not.toBeVisible();
   });
 
-  test("click on Close closes the modal", async ({ page }) => {
+  test("click on Close closes the modal", async ({ page, contactModal }) => {
     await closeModalOnButton(page, "New message");
 
     await expect(contactModal.heading).not.toBeVisible();

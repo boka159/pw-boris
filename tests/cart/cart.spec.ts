@@ -1,25 +1,10 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../../fixtures";
 import { closeModalOnButton, closeModalOnX } from "../../helpers/closeModal";
-import { LoginModal } from "../../pages/loginModal.page";
-import { NavBar } from "../../pages/navbar.page";
 import { CREDENTIALS, BUYER } from "../../testData";
 import { expectDialog } from "../../helpers/dialog";
-import { ProductPage } from "../../pages/productPage.page";
-import { PlaceOrderModal } from "../../pages/placeOrderModal.page";
-import { CartPage } from "../../pages/cartPage.page";
 
 test.describe("empty cart", () => {
-  let navbar: NavBar;
-  let loginModal: LoginModal;
-  let placeOrderModal: PlaceOrderModal;
-  let cartPage: CartPage;
-
-  test.beforeEach(async ({ page }) => {
-    navbar = new NavBar(page);
-    loginModal = new LoginModal(page);
-    placeOrderModal = new PlaceOrderModal(page);
-    cartPage = new CartPage(page);
-
+  test.beforeEach(async ({ page, navbar, loginModal }) => {
     await page.goto("/");
     await navbar.loginButton.click();
     await loginModal.login(CREDENTIALS.username, CREDENTIALS.password);
@@ -27,7 +12,7 @@ test.describe("empty cart", () => {
     await page.goto("/cart.html");
   });
 
-  test("page has necessary elements", async ({ page }) => {
+  test("page has necessary elements", async ({ page, cartPage }) => {
     await expect
       .soft(page.locator("html").getByRole("navigation"))
       .toBeVisible();
@@ -37,7 +22,11 @@ test.describe("empty cart", () => {
     await expect(cartPage.placeOrderButton).toBeVisible();
   });
 
-  test("Place order opens modal with necessary elements", async ({ page }) => {
+  test("Place order opens modal with necessary elements", async ({
+    page,
+    placeOrderModal,
+    cartPage,
+  }) => {
     await cartPage.placeOrderButton.click();
 
     await expect.soft(placeOrderModal.heading).toBeVisible();
@@ -65,7 +54,11 @@ test.describe("empty cart", () => {
     ).toHaveCount(6);
   });
 
-  test("click on X closes modal", async ({ page }) => {
+  test("click on X closes modal", async ({
+    page,
+    placeOrderModal,
+    cartPage,
+  }) => {
     await cartPage.placeOrderButton.click();
 
     await closeModalOnX(page, "Place order");
@@ -73,7 +66,11 @@ test.describe("empty cart", () => {
     await expect(placeOrderModal.heading).not.toBeVisible();
   });
 
-  test("click on Close closes modal", async ({ page }) => {
+  test("click on Close closes modal", async ({
+    page,
+    placeOrderModal,
+    cartPage,
+  }) => {
     await cartPage.placeOrderButton.click();
 
     await closeModalOnButton(page, "Place order");
@@ -83,21 +80,9 @@ test.describe("empty cart", () => {
 });
 
 test.describe("cart has items", () => {
-  let navbar: NavBar;
-  let loginModal: LoginModal;
-  let product: ProductPage;
-  let placeOrderModal: PlaceOrderModal;
-  let cartPage: CartPage;
-
   let productTitle: string;
 
-  test.beforeEach(async ({ page }) => {
-    navbar = new NavBar(page);
-    loginModal = new LoginModal(page);
-    product = new ProductPage(page);
-    placeOrderModal = new PlaceOrderModal(page);
-    cartPage = new CartPage(page);
-
+  test.beforeEach(async ({ page, navbar, loginModal, product }) => {
     await page.goto("/");
     await navbar.loginButton.click();
     await loginModal.login(CREDENTIALS.username, CREDENTIALS.password);
@@ -121,7 +106,7 @@ test.describe("cart has items", () => {
     ).toBeVisible();
   });
 
-  test("Delete removes product from cart", async ({ page }) => {
+  test("Delete removes product from cart", async ({ page, cartPage }) => {
     await expect(
       page.locator("html").getByRole("cell", { name: productTitle }).first(),
     ).toBeVisible();
@@ -149,7 +134,7 @@ test.describe("cart has items", () => {
     ).toBeVisible();
   });
 
-  test("places order successfully", async ({ page }) => {
+  test("places order successfully", async ({ placeOrderModal, cartPage }) => {
     await cartPage.placeOrderButton.click();
 
     await expect(placeOrderModal.heading).toBeVisible();
@@ -168,7 +153,11 @@ test.describe("cart has items", () => {
     await expect(placeOrderModal.successMessage).not.toBeVisible();
   });
 
-  test("mandatory empty fields return error", async ({ page }) => {
+  test("mandatory empty fields return error", async ({
+    page,
+    placeOrderModal,
+    cartPage,
+  }) => {
     await cartPage.placeOrderButton.click();
 
     await expect.soft(placeOrderModal.heading).toBeVisible();

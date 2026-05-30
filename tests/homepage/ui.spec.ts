@@ -1,12 +1,7 @@
-import { test, expect } from "@playwright/test";
-import { HomePage } from "../../pages/homePage.page";
+import { test, expect } from "../../fixtures";
 
-test.describe("Homepage", async () => {
-  let homepage: HomePage;
-
+test.describe("Homepage UI", () => {
   test.beforeEach(async ({ page }) => {
-    homepage = new HomePage(page);
-
     await page.goto("/");
   });
 
@@ -17,7 +12,7 @@ test.describe("Homepage", async () => {
     );
   });
 
-  test("product cards have rendered img", async ({ page }) => {
+  test("product cards have rendered img", async ({ page, homepage }) => {
     await expect(homepage.cards.first()).toBeVisible();
 
     const images = await page.locator(".card-img-top").all();
@@ -63,7 +58,7 @@ test.describe("Homepage", async () => {
     }
   });
 
-  test("product title has hover effect", async ({ page }) => {
+  test("product title has hover effect", async ({ page, homepage }) => {
     await expect(homepage.cards.first()).toBeVisible();
 
     const productTitles = await page
