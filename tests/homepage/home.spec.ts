@@ -1,13 +1,8 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../../fixtures";
 import { CATEGORIES } from "../../testData";
-import { HomePage } from "../../pages/homePage.page";
 
-test.describe("HomePage", async () => {
-  let homepage: HomePage;
-
+test.describe("Homepage", () => {
   test.beforeEach(async ({ page }) => {
-    homepage = new HomePage(page);
-
     await page.goto("/");
   });
 
@@ -15,7 +10,7 @@ test.describe("HomePage", async () => {
     await expect(page).toHaveTitle(/STORE/);
   });
 
-  test("has nav logo and links", async ({ page }) => {
+  test("has nav logo and links", async ({ page, homepage }) => {
     await expect.soft(homepage.logo).toHaveText("PRODUCT STORE");
     await expect(page.locator("#navbarExample a")).toContainText([
       "Home",
@@ -27,14 +22,14 @@ test.describe("HomePage", async () => {
     ]);
   });
 
-  test("has products", async ({ page }) => {
+  test("has products", async ({ homepage }) => {
     await expect.soft(homepage.cards.first()).toBeVisible();
     const count = await homepage.cards.count();
 
     await expect(count).toEqual(9);
   });
 
-  test("has card title and price", async ({ page }) => {
+  test("has card title and price", async ({ page, homepage }) => {
     await expect.soft(homepage.cards.first()).toBeVisible();
 
     const cardCount = await page.locator(".card-block").count();
@@ -45,7 +40,7 @@ test.describe("HomePage", async () => {
     await expect(page.locator(".card-text")).toHaveCount(cardCount);
   });
 
-  test("phones filter shows only phones", async ({ page }) => {
+  test("phones filter shows only phones", async ({ homepage }) => {
     await homepage.phonesFilter.click();
     await expect(homepage.cards).toContainText(CATEGORIES.phones);
     await expect(homepage.cards).not.toContainText([
@@ -54,7 +49,7 @@ test.describe("HomePage", async () => {
     ]);
   });
 
-  test("laptops filter shows only laptops", async ({ page }) => {
+  test("laptops filter shows only laptops", async ({ homepage }) => {
     await homepage.laptopsFilter.click();
     await expect(homepage.cards).toContainText(CATEGORIES.laptops);
     await expect(homepage.cards).not.toContainText([
@@ -63,7 +58,7 @@ test.describe("HomePage", async () => {
     ]);
   });
 
-  test("monitors filter shows only monitors", async ({ page }) => {
+  test("monitors filter shows only monitors", async ({ homepage }) => {
     await homepage.monitorsFilter.click();
     await expect(homepage.cards).toContainText(CATEGORIES.monitors);
     await expect(homepage.cards).not.toContainText([
@@ -72,14 +67,14 @@ test.describe("HomePage", async () => {
     ]);
   });
 
-  test("product card leads to product page", async ({ page }) => {
+  test("product card leads to product page", async ({ page, homepage }) => {
     const productTitle = await homepage.cardTitles.first().innerText();
     await page.locator(".card-img-top").first().click();
 
     await expect(page.locator(".name")).toHaveText(productTitle);
   });
 
-  test("has working pagination", async ({ page }) => {
+  test("has working pagination", async ({ homepage }) => {
     await expect.soft(homepage.cards.first()).toBeVisible();
     const pageOneProduct = await homepage.cardTitles.last().innerText();
 

@@ -1,22 +1,14 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../../fixtures";
 import { CREDENTIALS } from "../../testData";
 import { closeModalOnButton, closeModalOnX } from "../../helpers/closeModal";
-import { NavBar } from "../../pages/navbar.page";
-import { LoginModal } from "../../pages/loginModal.page";
 import { expectDialog } from "../../helpers/dialog";
 
-test.describe("NavBar", () => {
-  let navbar: NavBar;
-  let loginModal: LoginModal;
-
+test.describe("Login", () => {
   test.beforeEach(async ({ page }) => {
-    navbar = new NavBar(page);
-    loginModal = new LoginModal(page);
-
     await page.goto("/");
   });
 
-  test("Click on Log in opens login modal", async ({ page }) => {
+  test("Click on Log in opens login modal", async ({ page, navbar }) => {
     await navbar.loginButton.click();
     await expect(
       page.locator(".modal-header h5", { hasText: "Log in" }),
@@ -25,6 +17,8 @@ test.describe("NavBar", () => {
 
   test("successful login shows welcome user and log out links", async ({
     page,
+    navbar,
+    loginModal,
   }) => {
     await navbar.loginButton.click();
     await loginModal.login(CREDENTIALS.username, CREDENTIALS.password);
@@ -37,7 +31,11 @@ test.describe("NavBar", () => {
     ).toBeVisible();
   });
 
-  test("empty credential field returns error", async ({ page }) => {
+  test("empty credential field returns error", async ({
+    page,
+    navbar,
+    loginModal,
+  }) => {
     await navbar.loginButton.click();
 
     expectDialog(page, "Please fill out Username and Password.");
@@ -45,21 +43,29 @@ test.describe("NavBar", () => {
     await loginModal.loginButton.click();
   });
 
-  test("incorrect username returns error", async ({ page }) => {
+  test("incorrect username returns error", async ({
+    page,
+    navbar,
+    loginModal,
+  }) => {
     await navbar.loginButton.click();
     await loginModal.login("wrong username", CREDENTIALS.password);
 
     expectDialog(page, "User does not exist.");
   });
 
-  test("incorrect password returns error", async ({ page }) => {
+  test("incorrect password returns error", async ({
+    page,
+    navbar,
+    loginModal,
+  }) => {
     await navbar.loginButton.click();
     await loginModal.login(CREDENTIALS.username, "wrong_password");
 
     expectDialog(page, "Wrong password.");
   });
 
-  test("click on X closes the modal", async ({ page }) => {
+  test("click on X closes the modal", async ({ page, navbar }) => {
     await navbar.loginButton.click();
     await closeModalOnX(page, "Log in");
 
@@ -68,7 +74,7 @@ test.describe("NavBar", () => {
     ).not.toBeVisible();
   });
 
-  test("click on Close closes the modal", async ({ page }) => {
+  test("click on Close closes the modal", async ({ page, navbar }) => {
     await navbar.loginButton.click();
     await closeModalOnButton(page, "Log in");
 
@@ -77,7 +83,7 @@ test.describe("NavBar", () => {
     ).not.toBeVisible();
   });
 
-  test("click on Log out logs the user out", async ({ page }) => {
+  test("click on Log out logs the user out", async ({ navbar, loginModal }) => {
     await navbar.loginButton.click();
     await loginModal.login(CREDENTIALS.username, CREDENTIALS.password);
 
